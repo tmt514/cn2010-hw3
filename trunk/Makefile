@@ -1,4 +1,5 @@
-SOURCE=main.cpp serv.cpp mysock.cpp log.cpp dv_algo.cpp
+DVALGO=dv_algo.cpp
+SOURCE=main.cpp serv.cpp mysock.cpp log.cpp $(DVALGO)
 HEADER=serv.h mysock.h log.h
 all: DV_routing
 
