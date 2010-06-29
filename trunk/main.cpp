@@ -16,6 +16,7 @@ int main(int argc, char **argv) {
   if (!topo || !serv.Init(id, port))
     return 0;
   while (1) {
+    printf("> ");
     serv.Wait();
     char cmd[64];
     if (!strcmp(cmd, "send"))

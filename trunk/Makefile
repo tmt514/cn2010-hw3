@@ -4,5 +4,5 @@ HEADER=serv.h mysock.h log.h
 all: DV_routing
 
 DV_routing: $(SOURCE) $(HEADER)
-	g++ $(SOURCE) -o DV_routing
+	g++ $(SOURCE) -o DV_routing -g
 
