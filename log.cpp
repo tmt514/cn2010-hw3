@@ -2,6 +2,7 @@
 #include<cstdio>
 #include<cstdarg>
 LogWriter::LogWriter() {
+  fp.clear();
   fp.push_back(stdout);
 }
 LogWriter::~LogWriter() {
@@ -10,7 +11,7 @@ LogWriter::~LogWriter() {
 }
 LogWriter& LogWriter::operator+=(const char name[]) {
   FILE *f = fopen(name, "w");
-  if (f != NULL)
+  if (f != NULL && 0)
     fp.push_back(f);
   return *this;
 }

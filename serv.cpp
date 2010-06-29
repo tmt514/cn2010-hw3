@@ -1,4 +1,6 @@
 #include"serv.h"
+#include<algorithm>
+using namespace std;
 const unsigned kBufSize = 768;
 bool Server::Load(const char file[]){  
   FILE *fp = fopen(file, "r");
@@ -13,15 +15,15 @@ bool Server::Load(const char file[]){
   cost.resize(num_serv);
   fill(cost.begin(), cost.end(), inf);
   next.resize(num_serv);
-  dv.resize(num_serv);
+  dv.resize(num_serv);  
   unsigned i;
   for (i = 0; i < num_serv; ++i)
     next[i] = i;
     dv[i].clear();
-  for (i = 1; i < num_serv; ++i) {
+  for (i = 0; i < num_edges; ++i) {
     unsigned id, port;
-    char ip[kBufSize];
-    if (fscanf(fp, "%u %s %u", &id, &ip, &port)!=  3)
+    char ip[64];
+    if (fscanf(fp, "%u %s %u", &id, ip, &port) !=  3)
       return false;
     serv[id].SetDest(ip, port);
   }
@@ -32,7 +34,7 @@ bool Server::Load(const char file[]){
     dis[id] = cost[id] = c;
   }
   fclose(fp);
-  puts("Load topology file successfully");
+  printf("Load topology file successfully\n");
   Display();
   return true;
 }
@@ -40,7 +42,7 @@ bool Server::Init(unsigned i, unsigned port) {
   id = i;
   dis[id] = 0;
   char name[64];
-  sprintf(name, "log%d.txt", i);
+  sprintf(name, "log%u.txt", i + 1);
   w += name;
   return serv_sock.Bind(port);
 }
@@ -59,13 +61,13 @@ bool Server::Send() {
   }
 }
 bool Server::Refresh() {
-  puts("Refresh routing table.");  
+  w.printf("Refresh routing table.\n");  
   w.printf("Refresh %d: Link cost was changed\n", refresh_num++);
   Display();
   return DV_algo();
 }
 bool Server::Refresh(unsigned id, const vector<unsigned>& dv) {
-  puts("Refresh routing table.");
+  w.printf("Refresh routing table.\n");
   // TODO: DV_algo
   w.printf("Refresh %d: Receive DV from Server %d\n", refresh_num++, id);
   Display();
@@ -75,23 +77,24 @@ bool Server::Refresh(unsigned id, const vector<unsigned>& dv) {
 void Server::Update(unsigned id, unsigned c) {
   int i;
   cost[id] = c;
-  puts("Update successfully");
+  w.printf("Update successfully\n");
   Refresh();
 }
 void Server::Display() {
-  puts("Destination\tNext hop\tLink cost");
-  puts("===========================================");
+  printf("Destination\tNext hop\tLink cost\n");
+  printf("===========================================\n");
   for (unsigned i = 0; i < num_serv; ++i) {
-    w.printf("Server %u\tServer %u\t", i, next[i]);
+    if (i == id) continue;
+    printf("Server %u\tServer %u\t", i, next[i]);
     if (dis[i] < inf)
-      w.printf("%d\n", dis[i]);
+      printf("%d\n", dis[i]);
     else
-      w.printf("inf\n");
+      printf("inf\n");
   }
-  puts("===========================================");  
+  printf("===========================================\n");
 }
 void Server::PrintDVs() {
-  puts("DV of Neighbors:");
+  w.printf("DV of Neighbors:");
   w.printf("\t\t");
   unsigned i,j;
   for (i = 0; i < num_serv; ++i)
