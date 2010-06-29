@@ -1,5 +1,5 @@
 #include"serv.h"
-const unsigned inf = 257, kBufSize = 768;
+const unsigned kBufSize = 768;
 bool Server::Load(const char file[]){  
   FILE *fp = fopen(file, "r");
   if (fp == NULL)
