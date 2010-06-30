@@ -9,6 +9,7 @@ class Server {
 public:
   void Wait();
   bool Send();
+  bool Send(int server_id);
   bool Refresh();
   void Display();
   void PrintDVs();
