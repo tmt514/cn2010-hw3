@@ -65,14 +65,12 @@ bool Server::Send() {
 bool Server::Refresh() {
   w.printf("Refresh routing table.\n");  
   w.printf("Refresh %d: Link cost was changed\n", refresh_num++);
-  Display();
+  //Display();
   return DV_algo();
 }
 bool Server::Refresh(unsigned id) {
   w.printf("Refresh routing table.\n");
   w.printf("Refresh %d: Receive DV from Server %d\n", refresh_num++, id);
-  Display();
-  PrintDVs();
   return DV_algo();
 }
 void Server::Update(unsigned id, unsigned c) {
