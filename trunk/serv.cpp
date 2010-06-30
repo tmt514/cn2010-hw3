@@ -62,6 +62,21 @@ bool Server::Send() {
     serv_sock.Send(serv[i], 2 + num_serv * 2, buf);
   }
 }
+bool Server::Send(int server_id) {
+  unsigned char buf[kBufSize];
+  unsigned i, j;
+  for (i = j = 0; i < num_serv; ++i)
+    if (dis[i] < inf) ++j;
+  buf[0] = j;
+  buf[1] = 0;
+  for (i = 0; i < num_serv; ++i) {
+    if (dis[i] >= inf) continue;
+    buf[2 + --j*2] = i;
+    buf[2 + j*2 + 1] = dis[i];
+  }
+  w.printf("Send routing message to server %u.\n", i);
+  serv_sock.Send(serv[server_id], 2 + num_serv * 2, buf);
+}
 bool Server::Refresh() {
   w.printf("Refresh routing table.\n");  
   w.printf("Refresh %d: Link cost was changed\n", refresh_num++);
