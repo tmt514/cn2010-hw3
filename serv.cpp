@@ -1,5 +1,4 @@
 #include"serv.h"
-#include<algorithm>
 using namespace std;
 const unsigned kBufSize = 768;
 bool Server::Load(const char file[]){  
@@ -11,9 +10,9 @@ bool Server::Load(const char file[]){
     return false;
   serv.resize(num_serv);
   dis.resize(num_serv);
-  fill(dis.begin(), dis.end(), inf);
+  dis.fill(inf);
   cost.resize(num_serv);
-  fill(cost.begin(), cost.end(), inf);
+  cost.fill(inf);
   next.resize(num_serv);
   dv.resize(num_serv);  
   unsigned i;
@@ -25,7 +24,7 @@ bool Server::Load(const char file[]){
     char ip[64];
     if (fscanf(fp, "%u %s %u", &id, ip, &port) !=  3)
       return false;
-    serv[id].SetDest(ip, port);
+    serv[id] = serv_sock.SetDest(ip, port);
   }
   while (num_edges--) {
     unsigned id, c;
@@ -35,12 +34,12 @@ bool Server::Load(const char file[]){
   }
   fclose(fp);
   printf("Load topology file successfully\n");
-  Display();
   return true;
 }
 bool Server::Init(unsigned i, unsigned port) {
   id = i;
   dis[id] = 0;
+  Display();  
   char name[64];
   sprintf(name, "log%u.txt", i + 1);
   w += name;
@@ -48,16 +47,19 @@ bool Server::Init(unsigned i, unsigned port) {
 }
 bool Server::Send() {
   unsigned char buf[kBufSize];
-  buf[0] = num_serv;
+  unsigned i, j;
+  for (i = j = 0; i < num_serv; ++i)
+    if (dis[i] < inf) ++j;
+  buf[0] = j;
   buf[1] = 0;
-  unsigned i;
   for (i = 0; i < num_serv; ++i) {
-    buf[2 + i*2] = i;
-    buf[2 + i*2 + i] = dis[i];
+    if (dis[i] >= inf) continue;
+    buf[2 + --j*2] = i;
+    buf[2 + j*2 + 1] = dis[i];
   }
   for (i = 0; i < num_serv; ++i) {
     w.printf("Send routing message to server %u.\n", i);
-    serv[i].Send(2 + num_serv * 2, buf);
+    serv_sock.Send(serv[i], 2 + num_serv * 2, buf);
   }
 }
 bool Server::Refresh() {
@@ -66,9 +68,8 @@ bool Server::Refresh() {
   Display();
   return DV_algo();
 }
-bool Server::Refresh(unsigned id, const vector<unsigned>& dv) {
+bool Server::Refresh(unsigned id) {
   w.printf("Refresh routing table.\n");
-  // TODO: DV_algo
   w.printf("Refresh %d: Receive DV from Server %d\n", refresh_num++, id);
   Display();
   PrintDVs();
@@ -94,11 +95,12 @@ void Server::Display() {
   printf("===========================================\n");
 }
 void Server::PrintDVs() {
-  w.printf("DV of Neighbors:");
-  w.printf("\t\t");
+  w.printf("DV of Neighbors:\n");
   unsigned i,j;
+  w.printf("\t");
   for (i = 0; i < num_serv; ++i)
-    w.printf("\tto %u\n", i);
+    w.printf("\tto %u", i);
+  puts("");
   for (i = 0; i < num_serv; ++i) {
     if (dv[i].size() == 0)
       continue;
@@ -110,25 +112,27 @@ void Server::PrintDVs() {
         w.printf("\tinf");
       else
         w.printf("\t%u", dv[i][j]);
+    w.printf("\n");
   }
 }
 void Server::Wait() {
   unsigned char buf[kBufSize];
   while (serv_sock.Ready(0)) {
     serv_sock.Recv(kBufSize, buf);
-    unsigned i,from_serv;
+    unsigned i, from_serv;
     for (i = 0; i < num_serv; ++i)
-      if (serv[i] == serv_sock)
+      if (serv_sock == serv[i])
         break;
     from_serv = i;
-    vector<unsigned> t = dv[i];
-    for (i = 2; i < 2 + buf[0]*2; ++i)
-      t[buf[i]] = buf[i+1];
-    if (i >= num_serv) {
+    dv[from_serv].resize(num_serv);
+    dv[from_serv].fill(inf);
+    for (i = 2; i < 2 + buf[0]*2; i+=2)
+      dv[from_serv][buf[i]] = buf[i+1];
+    if (from_serv >= num_serv) {
       w.printf("Receive routing message from uknown server, discard.\n");
       continue;
     }
     w.printf("Receive routing message from server %u\n", from_serv);
-    Refresh(from_serv, t);
+    Refresh(from_serv);
   }
 }

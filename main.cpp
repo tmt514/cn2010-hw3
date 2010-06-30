@@ -3,7 +3,7 @@
 #include"serv.h"
 int main(int argc, char **argv) {
   unsigned int i, port = 65637, id = 257;
-  bool topo = false;
+  bool topo = true;
   Server serv;
   for (i = 1; i + 1 < argc; ++i) {
     if (!strcmp(argv[i], "-p"))
@@ -19,10 +19,10 @@ int main(int argc, char **argv) {
   }
   while (1) {
     printf("> ");
-	fflush(stdout);
+    fflush(stdout);
     serv.Wait();
     char cmd[64];
-	scanf("%s", cmd);
+    scanf("%s", cmd);
     if (!strcmp(cmd, "send"))
       serv.Send();
     else if (!strcmp(cmd, "update")) {

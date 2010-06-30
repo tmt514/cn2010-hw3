@@ -11,9 +11,9 @@ MySock::MySock() {
 	if (sd < 0)
 		perror("socket");
 }
-bool MySock::operator==(const MySock& s)const {
-  return dest.sin_addr.s_addr == s.from.sin_addr.s_addr
-    && dest.sin_port == s.from.sin_port;
+bool MySock::operator==(const sockaddr_in& s)const {
+  return from.sin_addr.s_addr == s.sin_addr.s_addr
+    && from.sin_port == s.sin_port;
 }
 bool MySock::Bind(unsigned port) {
 	sockaddr_in addr;
@@ -21,7 +21,7 @@ bool MySock::Bind(unsigned port) {
 	addr.sin_family = AF_INET;  
 	addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	addr.sin_port = htons(port);
-	int r = bind(sd,(struct sockaddr *)&addr,sizeof(addr));
+	int r = bind(sd,(sockaddr *)&addr,sizeof(addr));
 	if (r < 0) {
 		perror("bind");
     return false;
@@ -29,11 +29,12 @@ bool MySock::Bind(unsigned port) {
 	return true;
 }
 
-bool MySock::SetDest(const char ip[],unsigned port) {
+sockaddr_in MySock::SetDest(const char ip[],unsigned port) {
 	bzero(&dest,sizeof(dest));
 	dest.sin_family = AF_INET;
 	dest.sin_addr.s_addr = inet_addr(ip);
 	dest.sin_port = htons(port);
+  return dest;
 }
 
 bool MySock::Ready(int t) {
@@ -44,9 +45,11 @@ bool MySock::Ready(int t) {
  	select(sd + 1, &fds, NULL, NULL, NULL);
  	return FD_ISSET(sd, &fds);
 }
-
-int MySock::Send(unsigned len, const void *buf) {
+/*int MySock::Send(unsigned len, const void *buf) {
   return sendto(sd, buf, len, 0, (sockaddr *)&dest, sizeof(dest));
+}*/
+int MySock::Send(sockaddr_in d, unsigned len, const void *buf) {
+  return sendto(sd, buf, len, 0, (sockaddr *)&d, sizeof(d));
 }
 
 int MySock::Recv(unsigned len, void *buf) {

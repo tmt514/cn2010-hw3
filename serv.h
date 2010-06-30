@@ -1,9 +1,9 @@
 #ifndef _SERV_H
 #define _SERV_H
-#include<vector>
 #include"log.h"
+#include"vector.h"
 #include"mysock.h"
-using namespace std;
+#include<netinet/in.h>
 const unsigned inf = 257;
 class Server {
 public:
@@ -17,11 +17,11 @@ public:
   bool Load(const char file[]);
   bool Init(unsigned i, unsigned port);
   void Update(unsigned id, unsigned cost);
-  bool Refresh(unsigned id, const vector<unsigned>& dv);
+  bool Refresh(unsigned id);
 private:
   LogWriter w;
   MySock serv_sock;
-  vector<MySock> serv;
+  vector<sockaddr_in> serv;
   vector<vector<unsigned> > dv;
   vector<unsigned> dis, cost, next;
   unsigned id, num_serv, refresh_num;
