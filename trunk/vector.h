@@ -5,7 +5,10 @@ class vector {
 public:
   vector() {n = 0;}
   void clear() {n = 0;}
-  unsigned size() {return n;}
+  unsigned size() {
+//    puts("size");
+    return n;
+  }
   void fill(const T& v) {
     for (int i = 0; i < n; ++i)
       s[i] = v;

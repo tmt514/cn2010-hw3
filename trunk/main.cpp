@@ -32,5 +32,7 @@ int main(int argc, char **argv) {
     }
     else if (!strcmp(cmd, "display"))
       serv.Display();
+    else if (!strcmp(cmd, "end"))
+      break;
   }
 }
