@@ -13,12 +13,16 @@ int main(int argc, char **argv) {
     else if (!strcmp(argv[i], "-d"))
       sscanf(argv[++i], "%u", &id);
   }
-  if (!topo || !serv.Init(id, port))
+  if (!topo || !serv.Init(id, port)){
+	  fprintf(stderr, "Usage: DV_routing -p <port> -t <topo-file> -d <server-id>\n");
     return 0;
+  }
   while (1) {
     printf("> ");
+	fflush(stdout);
     serv.Wait();
     char cmd[64];
+	scanf("%s", cmd);
     if (!strcmp(cmd, "send"))
       serv.Send();
     else if (!strcmp(cmd, "update")) {
