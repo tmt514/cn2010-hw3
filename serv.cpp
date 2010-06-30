@@ -82,17 +82,17 @@ void Server::Update(unsigned id, unsigned c) {
   Refresh();
 }
 void Server::Display() {
-  printf("Destination\tNext hop\tLink cost\n");
-  printf("===========================================\n");
+  w.printf("Destination\tNext hop\tLink cost\n");
+  w.printf("===========================================\n");
   for (unsigned i = 0; i < num_serv; ++i) {
     if (i == id) continue;
-    printf("Server %u\tServer %u\t", i, next[i]);
+    w.printf("Server %u\tServer %u\t", i, next[i]);
     if (dis[i] < inf)
-      printf("%d\n", dis[i]);
+      w.printf("%d\n", dis[i]);
     else
-      printf("inf\n");
+      w.printf("inf\n");
   }
-  printf("===========================================\n");
+  w.printf("===========================================\n");
 }
 void Server::PrintDVs() {
   w.printf("DV of Neighbors:\n");

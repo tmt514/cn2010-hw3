@@ -11,15 +11,17 @@ LogWriter::~LogWriter() {
 }
 LogWriter& LogWriter::operator+=(const char name[]) {
   FILE *f = fopen(name, "w");
-  if (f != NULL && 0)
+  if (f != NULL)
     fp.push_back(f);
   return *this;
 }
 int LogWriter::printf(const char format[], ...) {
   va_list args;
-  va_start(args, format);
-  for (int i = 0; i < fp.size(); ++i)
+  for (int i = 0; i < fp.size(); ++i) {
+    va_start(args, format);
     vfprintf(fp[i], format, args);
-  va_end(args);
+    va_end(args);
+    fflush(fp[i]);
+  }
 }
 
