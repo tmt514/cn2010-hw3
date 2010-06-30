@@ -1,8 +1,7 @@
 #ifndef _LOG_H
 #define _LOG_H
 #include<cstdio>
-#include<vector>
-using namespace std;
+#include"vector.h"
 class LogWriter {
 public:
   LogWriter();

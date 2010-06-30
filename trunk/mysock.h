@@ -5,13 +5,14 @@ class MySock {
 public:
   MySock();
   bool Bind(unsigned port);
-  bool SetDest(const char ip[],unsigned port);
-  int Send(unsigned len, const void *buf);
+  sockaddr_in SetDest(const char ip[],unsigned port);
+  int Send(sockaddr_in d, unsigned len, const void *buf);
+//  int Send(unsigned len, const void *buf);
   int Recv(unsigned len, void *buf);
-  bool operator==(const MySock& s)const;
+  bool operator==(const sockaddr_in& s)const;
   bool Ready(int t);
   sockaddr_in from;
-private:
+//private:
   int sd;
   sockaddr_in dest;
 };

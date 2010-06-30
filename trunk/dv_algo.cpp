@@ -1,4 +1,6 @@
 #include"serv.h"
+#include<algorithm>
+using namespace std;
 bool Server::DV_algo() {
   unsigned i,j,d;
   bool send = false;
