@@ -9,16 +9,32 @@ bool Server::DV_algo() {
     unsigned d = inf, nd = i;
 		if(i == id) continue;
     for (j = 0; j < num_serv; ++j)
-			if(dv[j].size() == num_serv && d > cost[j] + dv[j][i]){
+			if(dv[j].size() == num_serv && cost[j] + dv[j][i] < d){
 				d = cost[j] + dv[j][i];
 	      nd = j;
 			}
+    if (cost[i] < d)
+      d = cost[i], nd = i;
     send |= (d != dis[i]);
 		dis[i] = d;
 		next[i] = nd;
   }
   Display();
   PrintDVs();
-  if (send) Send();
+  if (send){
+	  for(i = 0; i < num_serv; ++i){
+		  if(dv[i].size() == num_serv){ //connected with i
+			  vector<unsigned> t;
+			  for(j=0;j<num_serv;j++){
+				  t.push_back(dv[i][j]);
+				  if(next[j] == i)
+					  dv[i][j] = inf;
+			  }
+			  Send(i);
+			  for(j=0;j<num_serv;j++)
+				  dv[i][j] = t[j];
+		  }
+	  }
+  }
   return send; 
 }
