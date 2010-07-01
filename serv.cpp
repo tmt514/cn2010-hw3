@@ -65,6 +65,7 @@ bool Server::Send() {
     buf[2 + j*2 + 1] = dis[i];
   }
   for (i = 0; i < num_serv; ++i) {
+	if (cost[i] >= inf) continue;
     printf("Send routing message to server %u.\n", i);
     serv_sock.Send(serv[i], 2 + num_serv * 2, buf);
   }
@@ -128,11 +129,13 @@ void Server::PrintDVs() {
     w.printf("\tto %u", i);
   w.printf("\n");
   for (i = 0; i < num_serv; ++i) {
-    if (dv[i].size() == 0)
-      continue;
+	if (cost[i] >= inf) //jump when non-neighbor
+		continue;
+    /*if (dv[i].size() == 0)
+      continue;*/
     w.printf("Server %u", i);
     for (j = 0; j < num_serv; ++j)
-      if (j > dv[i].size())
+      if (j >= dv[i].size())
         w.printf("\t-");
       else if(dv[i][j] >= inf)
         w.printf("\tinf");
