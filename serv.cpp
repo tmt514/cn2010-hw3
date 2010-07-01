@@ -34,7 +34,10 @@ bool Server::Load(const char file[]){
     unsigned id, c;
     if (fscanf(fp, "%u %u", &id, &c) != 2)
       return false;
-    dis[id] = cost[id] = c;
+    //dis[id] = cost[id] = c;
+	cost[id] = c;
+	/*一開始dis[id]先給inf,這樣可以在第一次send的時候確保
+	  全部的人都能夠互相溝通過 */
   }
   fclose(fp);
   printf("Load topology file successfully\n");
