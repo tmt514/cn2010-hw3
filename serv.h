@@ -26,5 +26,6 @@ private:
   vector<vector<unsigned> > dv;
   vector<unsigned> dis, cost, next;
   unsigned id, num_serv, refresh_num;
+  vector<bool> mark;
 };
 #endif
