@@ -6,6 +6,7 @@
 #include<sys/time.h>
 #include<arpa/inet.h>
 #include<sys/socket.h>
+/* open an UDP connection */
 MySock::MySock() {
 	sd = socket(AF_INET, SOCK_DGRAM, 0);
 	if (sd < 0)
@@ -15,6 +16,7 @@ bool MySock::operator==(const sockaddr_in& s)const {
   return from.sin_addr.s_addr == s.sin_addr.s_addr
     && from.sin_port == s.sin_port;
 }
+/* bind to a specified port */
 bool MySock::Bind(unsigned port) {
 	sockaddr_in addr;
 	bzero(&addr,sizeof(addr));
@@ -28,7 +30,7 @@ bool MySock::Bind(unsigned port) {
   }
 	return true;
 }
-
+/* set a neighbor's destination IP and port */
 sockaddr_in MySock::SetDest(const char ip[],unsigned port) {
 	bzero(&dest,sizeof(dest));
 	dest.sin_family = AF_INET;
@@ -36,7 +38,7 @@ sockaddr_in MySock::SetDest(const char ip[],unsigned port) {
 	dest.sin_port = htons(port);
   return dest;
 }
-
+/* non-blocking IO */
 bool MySock::Ready(int t) {
 	fd_set fds;
 	FD_ZERO(&fds);
@@ -48,10 +50,12 @@ bool MySock::Ready(int t) {
 /*int MySock::Send(unsigned len, const void *buf) {
   return sendto(sd, buf, len, 0, (sockaddr *)&dest, sizeof(dest));
 }*/
+
+/* send to a specified destination */
 int MySock::Send(sockaddr_in d, unsigned len, const void *buf) {
   return sendto(sd, buf, len, 0, (sockaddr *)&d, sizeof(d));
 }
-
+/* receive DV from a neighbor */
 int MySock::Recv(unsigned len, void *buf) {
   socklen_t from_len = sizeof(from);
   return recvfrom(sd, buf, len, 0, (sockaddr *)&from, &from_len);
