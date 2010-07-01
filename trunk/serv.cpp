@@ -1,6 +1,7 @@
 #include"serv.h"
 using namespace std;
 const unsigned kBufSize = 768;
+/* Load the specified topology file */
 bool Server::Load(const char file[]){  
   FILE *fp = fopen(file, "r");
   if (fp == NULL)
@@ -39,6 +40,7 @@ bool Server::Load(const char file[]){
   printf("Load topology file successfully\n");
   return true;
 }
+/* Initialize the socket */
 bool Server::Init(unsigned i, unsigned port) {
   id = i;
   dis[id] = 0;
@@ -49,6 +51,7 @@ bool Server::Init(unsigned i, unsigned port) {
   w += name;
   return serv_sock.Bind(port);
 }
+/* send DV according to dis[] to all neighbors*/
 bool Server::Send() {
   unsigned char buf[kBufSize];
   unsigned i, j;
@@ -66,6 +69,7 @@ bool Server::Send() {
     serv_sock.Send(serv[i], 2 + num_serv * 2, buf);
   }
 }
+/* send DV according to dis[] to a specified neighbor */
 bool Server::Send(int dest_id) {
   unsigned char buf[kBufSize];
   unsigned i, j;
@@ -81,23 +85,27 @@ bool Server::Send(int dest_id) {
   printf("Send routing message to server %u.\n", dest_id);
   serv_sock.Send(serv[dest_id], 2 + num_serv * 2, buf);
 }
+/* refresh routing table when changing link cost using DV_algo */
 bool Server::Refresh() {
   printf("Refresh routing table.\n");  
   w.printf("Refresh %d: Link cost was changed\n", refresh_num++);
   //Display();
   return DV_algo();
 }
+/* refresh when receiving DV from other server */
 bool Server::Refresh(unsigned id) {
   printf("Refresh routing table.\n");
   w.printf("Refresh %d: Receive DV from Server %d\n", refresh_num++, id);
   return DV_algo();
 }
+/* the "update" operation */
 void Server::Update(unsigned id, unsigned c) {
   int i;
   cost[id] = c;
   printf("Update successfully\n");
   Refresh();
 }
+/* the "display" operation */
 void Server::Display() {
   w.printf("Destination\tNext hop\tLink cost\n");
   w.printf("===========================================\n");
@@ -111,6 +119,7 @@ void Server::Display() {
   }
   w.printf("===========================================\n");
 }
+/* print DVs from neighbors */
 void Server::PrintDVs() {
   w.printf("DV of Neighbors:\n");
   unsigned i,j;
@@ -133,6 +142,7 @@ void Server::PrintDVs() {
   }
   w.printf("\n");
 }
+/* use non-blocking IO to wait for stdin or a packet from neighbors*/
 void Server::Wait() {
   unsigned char buf[kBufSize];
   while (serv_sock.Ready(0)) {

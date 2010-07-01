@@ -1,11 +1,12 @@
 #include<cstdio>
 #include<cstring>
 #include"serv.h"
+/* The Start position of the program */
 int main(int argc, char **argv) {
   unsigned int i, port = 65637, id = 257;
   bool topo = true;
   Server serv;
-  for (i = 1; i + 1 < argc; ++i) {
+  for (i = 1; i + 1 < argc; ++i) { //get arguments
     if (!strcmp(argv[i], "-p"))
       sscanf(argv[++i], "%u", &port);
     else if (!strcmp(argv[i], "-t"))
@@ -20,7 +21,7 @@ int main(int argc, char **argv) {
   while (1) {
     printf("> ");
     fflush(stdout);
-    serv.Wait();
+    serv.Wait(); //check if any packet received, or stdin ready.
     char cmd[64];
     scanf("%s", cmd);
     if (!strcmp(cmd, "send"))
